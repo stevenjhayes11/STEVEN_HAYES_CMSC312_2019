@@ -1,4 +1,7 @@
 import java.util.*;
+import java.util.Scanner;
+import java.io.File;
+import java.io.FileNotFoundException;
 
 public class Part1RoundRobin {
 
@@ -7,7 +10,7 @@ public class Part1RoundRobin {
 	 * a list of processes from the Text that was read in
 	 * and execute processes based on this list
 	 */
-	protected class Scheduler{
+	protected static class Scheduler{
 		protected ArrayList<Process> processList;
 		protected Scheduler(ArrayList<Process> processList)
 		{
@@ -21,25 +24,36 @@ public class Part1RoundRobin {
 		{
 			processList.remove(index);
 		}
+		protected Process getProcess(int index)
+		{
+			return processList.get(index);
+		}
+		protected int getSize()
+		{
+			return processList.size();
+		}
+
 	}
 	
 	/*
 	 * Class holds process data
 	 */
-	protected class Process{
+	protected static class Process{
 		//PCB DATA
 		int ID;
-		int state;
+		int state; //0 - ready, 1 - running, 2 - waiting
 		//DATA
 		int timeNeeded;
 		int currentTime;
+		String processType;
 		
-		protected Process(int ID, int state, int timeNeeded)
+		protected Process(int ID, int state, int timeNeeded, String processType)
 		{
 			this.ID = ID;
 			this.state = state;
 			this.timeNeeded = timeNeeded;
 			currentTime = 0;
+			this.processType = processType;
 		}
 		protected void setState(int state)
 		{
@@ -61,12 +75,27 @@ public class Part1RoundRobin {
 		{
 			currentTime++;
 		}
+		protected int getCurrentTime()
+		{
+			return currentTime;
+		}
+		protected int getTimeNeeded()
+		{
+			return timeNeeded;
+		}
+		protected String getProcessType()
+		{
+			return processType;
+		}
 	}
 	
-	public static void main(String[] args) {
-		// TODO Auto-generated method stub
+	public static void main(String[] args) throws FileNotFoundException {
+		
+		// TODO Keep track of number of cycles for efficiency analysis		
 		
 		//initialize scheduler
+		
+		Scheduler scheduler;
 		
 		//load in file
 		
@@ -78,20 +107,101 @@ public class Part1RoundRobin {
 		
 		//read in processes and create PCB on intialization
 		//QUESTION - put all processes in then go through, correct?
-		ArrayList<Process> processList;
+		ArrayList<Process> processList = new ArrayList<Process>(1);
+		File source = new File("C:\\Users\\steve\\Desktop\\VCU\\CMSC 312\\Test Files for Part 1\\TextProcessor1.txt");
+		
+		Scanner sc = new Scanner(source);
+		int ID = 0;
+		while(sc.hasNextLine())
+		{
+			String temp = sc.nextLine();
+			int state;
+			int timeNeeded;
+			String processType;
+			
+			if(temp.contains("CALCULATE"))
+			{
+				processType = "CALCULATE";
+				temp = temp.substring(10);
+			}
+			else if(temp.contains("I/O"))
+			{
+				processType = "I/O";
+				temp = temp.substring(4);
+			}
+			else if(temp.contains("YIELD"))
+			{
+				processType = "YIELD";
+				temp = temp.substring(6);
+			}
+			else
+			{
+				processType = "OUT";
+				temp = temp.substring(4);
+			}
+			timeNeeded = Integer.parseInt(temp);
+			
+			Process newProcess = new Process(ID++, 0, timeNeeded, processType);
+			processList.add(newProcess);
+		}
+		scheduler = new Scheduler(processList);
 		
 		
-		/*
-		 * while(process isn't EXE)
-		 * {
-		 * 	for(int i = 0; i < 50; i++)
-		 * 	{
-		 * 		execute current process until complete or
-		 * 		i == 49
-		 * 	}
-		 * 	change current process to next in Queue
-		 * }
-		 */
+		int currentProcess = 0;
+		 
+		while(scheduler.getSize() != 0)
+		{
+		//execute currentProcess until complete or
+  		//i == 49
+				boolean processRemoved = false;
+				for(int i = 0; i < 25; i++)
+			  	{
+				 	//TODO need to initialize processList before this
+					//if the process has not been completed
+					if(scheduler.getProcess(currentProcess).getCurrentTime() != scheduler.getProcess(currentProcess).getTimeNeeded())
+			  		{
+			  			scheduler.getProcess(currentProcess).incrementTime();
+			  			System.out.print(scheduler.getProcess(currentProcess).getID() + " ");
+			  			System.out.println(scheduler.getProcess(currentProcess).getProcessType() + " " + scheduler.getProcess(currentProcess).getCurrentTime());
+			  		}
+			  		//if process has been completed, remove it from scheduler list
+			  		else
+			  		{
+			  			i = 25;
+			  			scheduler.removeProcess(currentProcess);
+			  			processRemoved = true;
+			  		}
+					
+			  		
+			  	}
+			//TODO change state of old process
+			System.out.println(currentProcess);
+			if(processRemoved)
+			{
+				if(currentProcess >= scheduler.getSize())
+					currentProcess = 0;
+				processRemoved = false;
+			}
+			else
+			{
+				scheduler.getProcess(currentProcess).setState(0);
+			 	currentProcess++;
+			 	if(currentProcess >= processList.size())
+			  		currentProcess = 0;	
+			}
+			System.out.println(currentProcess);
+			 
+			if(scheduler.getSize() != 0)
+			{
+				scheduler.getProcess(currentProcess).setState(1);
+			}
+					
+		}
+		//change current process to next in Queue
+		//change state of current process
+		 
+		 
+		 
 		//start executing Processes
 		//---dispatcher starts at head of process list
 		//---gives a process time Q to execute
