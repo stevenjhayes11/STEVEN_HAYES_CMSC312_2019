@@ -36,7 +36,8 @@ public class Part1RoundRobin {
 	}
 	
 	/*
-	 * Class holds process data
+	 * Class holds process data such as state, how many iterations of the process
+	 * will be executed, and what type of process it is
 	 */
 	protected static class Process{
 		//PCB DATA
@@ -89,6 +90,27 @@ public class Part1RoundRobin {
 		}
 	}
 	
+	protected static class Dispatcher{
+		protected Dispatcher()
+		{
+			
+		}
+		protected void changeStateToReady(Process processToChangeState)
+		{
+			processToChangeState.setState(0);
+		}
+		protected void changeStateToRunning(Process processToChangeState)
+		{
+			processToChangeState.setState(1);
+		}
+		protected void changeStateToWaiting(Process processToChangeState)
+		{
+			processToChangeState.setState(2);
+		}
+		
+		
+	}
+	
 	public static void main(String[] args) throws FileNotFoundException {
 		
 		// TODO Keep track of number of cycles for efficiency analysis		
@@ -104,6 +126,7 @@ public class Part1RoundRobin {
 		String name;
 		int runtime;
 		int availMem;
+		Dispatcher dispatch = new Dispatcher();
 		
 		//read in processes and create PCB on intialization
 		//QUESTION - put all processes in then go through, correct?
@@ -175,7 +198,7 @@ public class Part1RoundRobin {
 			  		
 			  	}
 			//TODO change state of old process
-			System.out.println(currentProcess);
+			System.out.println("first " + currentProcess);
 			if(processRemoved)
 			{
 				if(currentProcess >= scheduler.getSize())
@@ -184,21 +207,20 @@ public class Part1RoundRobin {
 			}
 			else
 			{
-				scheduler.getProcess(currentProcess).setState(0);
+				dispatch.changeStateToReady(scheduler.getProcess(currentProcess));
 			 	currentProcess++;
 			 	if(currentProcess >= processList.size())
 			  		currentProcess = 0;	
 			}
-			System.out.println(currentProcess);
+			System.out.println("second " + currentProcess);
 			 
 			if(scheduler.getSize() != 0)
 			{
-				scheduler.getProcess(currentProcess).setState(1);
+				dispatch.changeStateToRunning(scheduler.getProcess(currentProcess));
 			}
 					
 		}
-		//change current process to next in Queue
-		//change state of current process
+		
 		 
 		 
 		 
