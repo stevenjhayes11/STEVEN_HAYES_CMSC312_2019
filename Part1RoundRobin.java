@@ -200,6 +200,10 @@ public class Part1RoundRobin {
 		Scanner sc = new Scanner(source);
 		int ID = 0;
 		//while there are more lines remaining from the file, keep getting new data
+		for(int i = 0; i < 4; i++)
+			sc.nextLine();
+		boolean isEXE = false;
+		
 		while(sc.hasNextLine())
 		{
 			String temp = sc.nextLine();
@@ -223,18 +227,28 @@ public class Part1RoundRobin {
 				processType = "YIELD";
 				temp = temp.substring(6);
 			}
-			else
+			else if(temp.contains("OUT"))
 			{
 				processType = "OUT";
 				temp = temp.substring(4);
 			}
+			else
+			{
+				processType = "EXE";
+				isEXE = true;
+			}
 			
 			//get number of process executions then add a random between 1-25
-			timeNeeded = Integer.parseInt(temp);
-			Random rand = new Random();
-			int x = rand.nextInt(25);
-			timeNeeded = timeNeeded + x;
-			
+			if(isEXE)
+				timeNeeded = 1;
+			else
+			{
+				timeNeeded = Integer.parseInt(temp);
+				Random rand = new Random();
+				int x = rand.nextInt(25);
+				timeNeeded = timeNeeded + x;
+			}
+	
 			//create a new process using parsed data and add it to the process List
 			Process newProcess = new Process(ID++, 0, timeNeeded, processType);
 			processList.add(newProcess);
@@ -254,10 +268,24 @@ public class Part1RoundRobin {
   		//i == 49
 				boolean processRemoved = false;
 				//execute until process completes of i == 25
+				System.out.println(scheduler.getProcess(currentProcess).getProcessType());
 				for(int i = 0; i < 25; i++)
 			  	{
+					//if EXE is reached and there are no other processes, end
+					if(scheduler.getSize() == 1 && scheduler.getProcess(currentProcess).getProcessType().equalsIgnoreCase("EXE"))
+					{
+						System.out.println("All Processes Completed");
+						i = 25;
+						scheduler.removeProcess(currentProcess);
+						processRemoved = true;
+					}
+					//if EXE is reached and there ARE other process, skip EXE
+					else if(scheduler.getSize() != 1 && scheduler.getProcess(currentProcess).getProcessType().equalsIgnoreCase("EXE"))
+					{
+						i = 25;
+					}
 					//if the process has not been completed, execute next part
-					if(scheduler.getProcess(currentProcess).getCurrentTime() != scheduler.getProcess(currentProcess).getTimeNeeded())
+					else if(scheduler.getProcess(currentProcess).getCurrentTime() != scheduler.getProcess(currentProcess).getTimeNeeded())
 			  		{
 			  			scheduler.getProcess(currentProcess).incrementTime();
 			  			System.out.print(scheduler.getProcess(currentProcess).getID() + " ");
@@ -308,3 +336,15 @@ public class Part1RoundRobin {
 	}
 
 }
+//TODO
+//if calc(25) represents 25 calc processes, not a calc process that runs for 25 cycles
+//1. change process class/create a new class which will have be an arraylist of the 
+//types of process and will hold the number of those processes to be executed and their PCB info
+//
+//2. give each individual process a random amount of time needed to run
+//
+//
+//OR
+//upon creating a process object like normal, instead of creating 1 process to add to the scheduler
+//create the required amount and give them all random run times
+
