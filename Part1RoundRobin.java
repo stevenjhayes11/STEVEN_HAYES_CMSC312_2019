@@ -268,41 +268,54 @@ public class Part1RoundRobin {
   		//i == 49
 				boolean processRemoved = false;
 				//execute until process completes of i == 25
-				System.out.println(scheduler.getProcess(currentProcess).getProcessType());
-				for(int i = 0; i < 25; i++)
-			  	{
-					//if EXE is reached and there are no other processes, end
-					if(scheduler.getSize() == 1 && scheduler.getProcess(currentProcess).getProcessType().equalsIgnoreCase("EXE"))
+				boolean IO = false;
+				if(scheduler.getProcess(currentProcess).getProcessType().equalsIgnoreCase("I/O"))
+					IO = true;
+				if(IO)
+				{
+					while(scheduler.getProcess(currentProcess).getTimeNeeded() > scheduler.getProcess(currentProcess).getCurrentTime())
 					{
-						System.out.println("All Processes Completed");
-						i = 25;
-						scheduler.removeProcess(currentProcess);
-						processRemoved = true;
-					}
-					//if EXE is reached and there ARE other process, skip EXE
-					else if(scheduler.getSize() != 1 && scheduler.getProcess(currentProcess).getProcessType().equalsIgnoreCase("EXE"))
-					{
-						i = 25;
-					}
-					//if the process has not been completed, execute next part
-					else if(scheduler.getProcess(currentProcess).getCurrentTime() != scheduler.getProcess(currentProcess).getTimeNeeded())
-			  		{
-			  			scheduler.getProcess(currentProcess).incrementTime();
-			  			System.out.print(scheduler.getProcess(currentProcess).getID() + " ");
+						scheduler.getProcess(currentProcess).incrementTime();
+						System.out.print(scheduler.getProcess(currentProcess).getID() + " ");
 			  			System.out.println(scheduler.getProcess(currentProcess).getProcessType() + " " + scheduler.getProcess(currentProcess).getCurrentTime());
-			  		}
-			  		//if process has been completed, remove it from scheduler list and
-					//attempt to go to next process
-			  		else
-			  		{
-			  			i = 25;
-			  			scheduler.removeProcess(currentProcess);
-			  			processRemoved = true;
-			  		}
-					
-			  		
-			  	}
-				
+					}
+				}
+				else 
+				{
+					for(int i = 0; i < 25; i++)
+				  	{
+						//if EXE is reached and there are no other processes, end
+						if(scheduler.getSize() == 1 && scheduler.getProcess(currentProcess).getProcessType().equalsIgnoreCase("EXE"))
+						{
+							System.out.println("All Processes Completed");
+							i = 25;
+							scheduler.removeProcess(currentProcess);
+							processRemoved = true;
+						}
+						//if EXE is reached and there ARE other process, skip EXE
+						else if(scheduler.getSize() != 1 && scheduler.getProcess(currentProcess).getProcessType().equalsIgnoreCase("EXE"))
+						{
+							i = 25;
+						}
+						//if the process has not been completed, execute next part
+						else if(scheduler.getProcess(currentProcess).getCurrentTime() != scheduler.getProcess(currentProcess).getTimeNeeded())
+				  		{
+				  			scheduler.getProcess(currentProcess).incrementTime();
+				  			System.out.print(scheduler.getProcess(currentProcess).getID() + " ");
+				  			System.out.println(scheduler.getProcess(currentProcess).getProcessType() + " " + scheduler.getProcess(currentProcess).getCurrentTime());
+				  		}
+				  		//if process has been completed, remove it from scheduler list and
+						//attempt to go to next process
+				  		else
+				  		{
+				  			i = 25;
+				  			scheduler.removeProcess(currentProcess);
+				  			processRemoved = true;
+				  		}
+						
+				  		
+				  	}
+				}
 			//if the process was completed, remove it from the list
 			if(processRemoved)
 			{
