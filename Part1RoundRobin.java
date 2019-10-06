@@ -193,157 +193,203 @@ public class Part1RoundRobin {
 		int availMem;
 		Dispatcher dispatch = new Dispatcher();
 		
+		Scanner kb = new Scanner(System.in);
+		System.out.println("How many processes to run for test files 1, 2, 3, and 4?");
+		int test1 = kb.nextInt();
+		int test2 = kb.nextInt();
+		int test3 = kb.nextInt();
+		int test4 = kb.nextInt();
+				
 		//read in processes and create PCB on intialization
-		ArrayList<Process> processList = new ArrayList<Process>(1);
-		File source = new File("C:\\Users\\steve\\Desktop\\VCU\\CMSC 312\\Test Files for Part 1\\TextProcessor1.txt");
-		
-		Scanner sc = new Scanner(source);
-		int ID = 0;
-		//while there are more lines remaining from the file, keep getting new data
-		for(int i = 0; i < 4; i++)
-			sc.nextLine();
-		boolean isEXE = false;
-		
-		while(sc.hasNextLine())
+		for(int testFileNumber = 0; testFileNumber < 4; testFileNumber++)
 		{
-			String temp = sc.nextLine();
-			int state;
-			int timeNeeded;
-			String processType;
-			
-			//get process type
-			if(temp.contains("CALCULATE"))
-			{
-				processType = "CALCULATE";
-				temp = temp.substring(10);
-			}
-			else if(temp.contains("I/O"))
-			{
-				processType = "I/O";
-				temp = temp.substring(4);
-			}
-			else if(temp.contains("YIELD"))
-			{
-				processType = "YIELD";
-				temp = temp.substring(6);
-			}
-			else if(temp.contains("OUT"))
-			{
-				processType = "OUT";
-				temp = temp.substring(4);
-			}
+			//check how many times user wanted the process executed
+			int reps;
+			if(testFileNumber == 0)
+				reps = test1;
+			else if(testFileNumber == 1)
+				reps = test2;
+			else if(testFileNumber == 2)
+				reps = test3;
 			else
-			{
-				processType = "EXE";
-				isEXE = true;
-			}
+				reps = test4;
+			ArrayList<Process> processList = new ArrayList<Process>(1);
 			
-			//get number of process executions then add a random between 1-25
-			if(isEXE)
-				timeNeeded = 1;
-			else
+			//execute each process the number of times the user specified
+			for(int timesRun = 0; timesRun < reps; timesRun++)
 			{
-				timeNeeded = Integer.parseInt(temp);
-				Random rand = new Random();
-				int x = rand.nextInt(25);
-				timeNeeded = timeNeeded + x;
-			}
-	
-			//create a new process using parsed data and add it to the process List
-			Process newProcess = new Process(ID++, 0, timeNeeded, processType);
-			processList.add(newProcess);
-		}
-		
-		//add process list to scheduler
-		scheduler = new Scheduler(processList);
-		
-		
-		int currentProcess = 0;
-		 
-		
-		//as long as scheduler has items still in it
-		while(scheduler.getSize() != 0)
-		{
-		//execute currentProcess until complete or
-  		//i == 49
-				boolean processRemoved = false;
-				//execute until process completes of i == 25
-				boolean IO = false;
-				if(scheduler.getProcess(currentProcess).getProcessType().equalsIgnoreCase("I/O"))
-					IO = true;
-				if(IO)
+				System.out.println("Source File: " + (testFileNumber+1));
+				int ID = 0;
+				
+				Scanner sc;
+				switch(testFileNumber)
 				{
-					while(scheduler.getProcess(currentProcess).getTimeNeeded() > scheduler.getProcess(currentProcess).getCurrentTime())
-					{
-						scheduler.getProcess(currentProcess).incrementTime();
-						System.out.print(scheduler.getProcess(currentProcess).getID() + " ");
-			  			System.out.println(scheduler.getProcess(currentProcess).getProcessType() + " " + scheduler.getProcess(currentProcess).getCurrentTime());
-					}
+					case(0):
+						File source1 = new File("C:\\Users\\steve\\Desktop\\VCU\\CMSC 312\\Test Files for Part 1\\TextProcessor1.txt");
+						sc = new Scanner(source1);
+						break;
+					case(1):
+						File source2 = new File("C:\\Users\\steve\\Desktop\\VCU\\CMSC 312\\Test Files for Part 1\\TextProcessor2.txt");
+						sc = new Scanner(source2);
+						break;
+					case(2):
+						File source3 = new File("C:\\Users\\steve\\Desktop\\VCU\\CMSC 312\\Test Files for Part 1\\TextProcessor3.txt");
+						sc = new Scanner(source3);
+						break;
+					case(3):
+						File source4 = new File("C:\\Users\\steve\\Desktop\\VCU\\CMSC 312\\Test Files for Part 1\\TextProcessor4.txt");
+						sc = new Scanner(source4);
+						break;
+					default:
+						File source5 = new File("C:\\Users\\steve\\Desktop\\VCU\\CMSC 312\\Test Files for Part 1\\TextProcessor1.txt");
+						sc = new Scanner(source5);
+						break;
 				}
-				else 
+				//while there are more lines remaining from the file, keep getting new data
+				for(int i = 0; i < 4; i++)
+					sc.nextLine();
+				boolean isEXE = false;
+				
+				while(sc.hasNextLine())
 				{
-					for(int i = 0; i < 25; i++)
-				  	{
-						//if EXE is reached and there are no other processes, end
-						if(scheduler.getSize() == 1 && scheduler.getProcess(currentProcess).getProcessType().equalsIgnoreCase("EXE"))
+					String temp = sc.nextLine();
+					int state;
+					int timeNeeded;
+					String processType;
+					
+					//get process type
+					if(temp.contains("CALCULATE"))
+					{
+						processType = "CALCULATE";
+						temp = temp.substring(10);
+					}
+					else if(temp.contains("I/O"))
+					{
+						processType = "I/O";
+						temp = temp.substring(4);
+					}
+					else if(temp.contains("YIELD"))
+					{
+						processType = "YIELD";
+						temp = temp.substring(6);
+					}
+					else if(temp.contains("OUT"))
+					{
+						processType = "OUT";
+						temp = temp.substring(4);
+					}
+					else
+					{
+						processType = "EXE";
+						isEXE = true;
+					}
+					
+					//get number of process executions then add a random between 1-25
+					if(isEXE)
+						timeNeeded = 1;
+					else
+						timeNeeded = Integer.parseInt(temp);
+			
+					//create a new process using parsed data and add it to the process List
+					Process newProcess = new Process(ID++, 0, timeNeeded, processType);
+					processList.add(newProcess);
+				}
+				
+				//add process list to scheduler
+				scheduler = new Scheduler(processList);
+				
+				
+				int currentProcess = 0;
+				 
+				
+				//as long as scheduler has items still in it
+				while(scheduler.getSize() > 0)
+				{
+				//execute currentProcess until complete or
+		  		//i == 49
+						boolean processRemoved = false;
+						//execute until process completes of i == 25
+						boolean IO = false;
+						if(scheduler.getProcess(currentProcess).getProcessType().equalsIgnoreCase("I/O"))
+							IO = true;
+						if(IO)
 						{
-							System.out.println("All Processes Completed");
-							i = 25;
+							while(scheduler.getProcess(currentProcess).getTimeNeeded() > scheduler.getProcess(currentProcess).getCurrentTime())
+							{
+								scheduler.getProcess(currentProcess).incrementTime();
+								System.out.print(scheduler.getProcess(currentProcess).getID() + " ");
+					  			System.out.println(scheduler.getProcess(currentProcess).getProcessType() + " " + scheduler.getProcess(currentProcess).getCurrentTime());
+							}
 							scheduler.removeProcess(currentProcess);
 							processRemoved = true;
 						}
-						//if EXE is reached and there ARE other process, skip EXE
-						else if(scheduler.getSize() != 1 && scheduler.getProcess(currentProcess).getProcessType().equalsIgnoreCase("EXE"))
+						else 
 						{
-							i = 25;
+							for(int i = 0; i < 25; i++)
+						  	{
+								//if EXE is reached and there are no other processes, end
+								if(scheduler.getSize() == 1 && scheduler.getProcess(currentProcess).getProcessType().equalsIgnoreCase("EXE"))
+								{
+									System.out.println("Process Complete\n\n\n");
+									i = 25;
+									scheduler.removeProcess(currentProcess);
+									processRemoved = true;
+								}
+								//if EXE is reached and there ARE other process, skip EXE
+								else if(scheduler.getSize() != 1 && scheduler.getProcess(currentProcess).getProcessType().equalsIgnoreCase("EXE"))
+								{
+									i = 25;
+								}
+								//if the process has not been completed, execute next part
+								else if(scheduler.getProcess(currentProcess).getCurrentTime() != scheduler.getProcess(currentProcess).getTimeNeeded())
+						  		{
+						  			scheduler.getProcess(currentProcess).incrementTime();
+						  			System.out.print(scheduler.getProcess(currentProcess).getID() + " ");
+						  			System.out.println(scheduler.getProcess(currentProcess).getProcessType() + " " + scheduler.getProcess(currentProcess).getCurrentTime());
+						  		}
+						  		//if process has been completed, remove it from scheduler list and
+								//attempt to go to next process
+						  		else
+						  		{
+						  			i = 25;
+						  			scheduler.removeProcess(currentProcess);
+						  			processRemoved = true;
+						  		}
+								
+						  		
+						  	}
 						}
-						//if the process has not been completed, execute next part
-						else if(scheduler.getProcess(currentProcess).getCurrentTime() != scheduler.getProcess(currentProcess).getTimeNeeded())
-				  		{
-				  			scheduler.getProcess(currentProcess).incrementTime();
-				  			System.out.print(scheduler.getProcess(currentProcess).getID() + " ");
-				  			System.out.println(scheduler.getProcess(currentProcess).getProcessType() + " " + scheduler.getProcess(currentProcess).getCurrentTime());
-				  		}
-				  		//if process has been completed, remove it from scheduler list and
-						//attempt to go to next process
-				  		else
-				  		{
-				  			i = 25;
-				  			scheduler.removeProcess(currentProcess);
-				  			processRemoved = true;
-				  		}
-						
-				  		
-				  	}
-				}
-			//if the process was completed, remove it from the list
-			if(processRemoved)
-			{
-				if(currentProcess >= scheduler.getSize())
-					currentProcess = 0;
-				processRemoved = false;
-			}
-			//if the process was not completed, change state to ready and
-			//move on to next process on the list or to beginning of list if at the end
-			else
-			{
-				dispatch.changeStateToReady(scheduler.getProcess(currentProcess));
-			 	currentProcess++;
-			 	if(currentProcess >= processList.size())
-			  		currentProcess = 0;	
-			}
-			 
-			//as long as there are still processes remaining, change the new process
-			//to be worked's state on to "running"
-			if(scheduler.getSize() != 0)
-			{
-				//If the process is I/O it goes to waiting, else goes to running
-				if(scheduler.getProcess(currentProcess).getProcessType().equalsIgnoreCase("I/O"))
-					dispatch.changeStateToWaiting(scheduler.getProcess(currentProcess));
-				else
-					dispatch.changeStateToRunning(scheduler.getProcess(currentProcess));
-			}
+					//if the process was completed, remove it from the list
+					if(processRemoved)
+					{
+						if(currentProcess >= scheduler.getSize())
+							currentProcess = 0;
+						processRemoved = false;
+					}
+					//if the process was not completed, change state to ready and
+					//move on to next process on the list or to beginning of list if at the end
+					else
+					{
+						dispatch.changeStateToReady(scheduler.getProcess(currentProcess));
+					 	currentProcess++;
+					 	if(currentProcess >= processList.size())
+					  		currentProcess = 0;	
+					}
+					 
+					//as long as there are still processes remaining, change the new process
+					//to be worked's state on to "running"
+					if(scheduler.getSize() != 0)
+					{
+						//If the process is I/O it goes to waiting, else goes to running
+						if(scheduler.getProcess(currentProcess).getProcessType().equalsIgnoreCase("I/O"))
+							dispatch.changeStateToWaiting(scheduler.getProcess(currentProcess));
+						else
+							dispatch.changeStateToRunning(scheduler.getProcess(currentProcess));
+					}
 					
+					
+				}
+			}
 		}
 		
 	}
