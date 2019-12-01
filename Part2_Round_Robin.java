@@ -785,13 +785,15 @@ public class Part2_Round_Robin {
 			ProcessorThread core3Threads = new ProcessorThread(core3List);
 			core3Threads.start();
 			System.out.println("Core4 Cache");
+			ArrayList<Page> core4List = new ArrayList<Page>();
 			for(int i = 0; i < core4CacheCycles; i++)
 			{
 				Page tempPage = core4.getPage();
-				ProcessorThread newThread = new ProcessorThread(tempPage);
-				newThread.start();
+				core4List.add(tempPage);
 				//System.out.println(core1.getPage().runPage());
 			}
+			ProcessorThread core4Threads = new ProcessorThread(core4List);
+			core4Threads.start();
 			
 			boolean coresEmpty = core1.isEmpty() && core2.isEmpty() && core3.isEmpty() && core4.isEmpty();
 			boolean schedulersEmpty = (schedulerRAM.getSize() == 0 && schedulerHDD.getSize() == 0);
